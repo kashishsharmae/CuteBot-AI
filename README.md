@@ -50,4 +50,4 @@ This project is designed for:
 
 Kashish Sharma
 AI & Data Science Developer
-FlexiMode AI Chatbot Project
+CuteBot AI Chatbot Project
