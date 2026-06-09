@@ -1,135 +1,97 @@
 import streamlit as st
-from chatbot import online_chat, offline_chat, check_offline_status
+from chatbot import chat, check_offline_status
 
 # =========================
 # PAGE CONFIG
 # =========================
-
 st.set_page_config(
-    page_title="FlexiMode AI Chatbot",
-    page_icon="🤖",
-    layout="wide"
+    page_title="CuteBot AI 💖",
+    page_icon="💬",
+    layout="centered"
 )
 
 # =========================
-# CUSTOM CSS
+# MAGENTA CUTE UI
 # =========================
-
 st.markdown("""
 <style>
-.main-title {
-    text-align:center;
-    font-size:42px;
-    font-weight:bold;
+body {
+    background: linear-gradient(135deg, #ff4ecd, #8a2be2);
 }
 
-.sub-title {
-    text-align:center;
-    color:gray;
-    margin-bottom:20px;
+.stApp {
+    background: linear-gradient(135deg, #ff4ecd, #8a2be2);
 }
 
-.status-box {
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:10px;
+h1 {
+    color: white;
+    text-align: center;
+}
+
+.user {
+    background: #ffb6f0;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 5px;
+}
+
+.bot {
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 5px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# TITLE
 # =========================
-
-st.markdown(
-    '<div class="main-title">🤖 FlexiMode AI Chatbot</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="sub-title">Online Gemini + Offline Ollama AI Assistant</div>',
-    unsafe_allow_html=True
-)
+st.title("💖 CuteBot AI 💬")
+st.caption("Cute • Offline • Private AI Assistant 💖")
 
 # =========================
-# SIDEBAR
+# SESSION STATE
 # =========================
-
-with st.sidebar:
-
-    st.header("⚙️ Settings")
-
-    mode = st.radio(
-        "Select AI Mode",
-        ["Online (Gemini)", "Offline (Ollama)"]
-    )
-
-    st.divider()
-
-    st.subheader("System Status")
-
-    if check_offline_status():
-        st.success("🟢 Ollama Connected")
-    else:
-        st.error("🔴 Ollama Not Running")
-
-# =========================
-# CHAT HISTORY
-# =========================
-
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display history
-
-for msg in st.session_state.messages:
-
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+# =========================
+# INPUT
+# =========================
+user_input = st.chat_input("Say something cute 💬")
 
 # =========================
-# USER INPUT
+# CHAT LOGIC
 # =========================
-
-prompt = st.chat_input("Ask anything...")
-
-if prompt:
-
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": prompt
-        }
-    )
-
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-
-        with st.spinner("Thinking..."):
-
-            if mode == "Online (Gemini)":
-                response = online_chat(prompt)
-
-            else:
-                response = offline_chat(prompt)
-
-        st.markdown(response)
-
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": response
-        }
-    )
+if user_input:
+    st.session_state.messages.append(("user", user_input))
+    reply = chat(user_input)
+    st.session_state.messages.append(("bot", reply))
 
 # =========================
-# FOOTER
+# TOGGLE HISTORY
 # =========================
+hide = st.toggle("🙈 Hide Chat History")
 
-st.divider()
+# =========================
+# DISPLAY CHAT
+# =========================
+if not hide:
+    for role, msg in st.session_state.messages:
+        if role == "user":
+            st.markdown(f"<div class='user'>🧑‍💻 {msg}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div class='bot'>🤖 {msg}</div>", unsafe_allow_html=True)
+else:
+    st.info("Chat history hidden 🙈")
 
-st.caption(
-    "Developed by Kashish Sharma | FlexiMode AI Chatbot"
-)
+# =========================
+# STATUS
+# =========================
+st.sidebar.title("💖 CuteBot AI")
+
+if check_offline_status():
+    st.sidebar.success("Ollama Running ✅")
+else:
+    st.sidebar.error("Ollama Not Running ❌")
